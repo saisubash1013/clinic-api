@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/appointments")
@@ -45,5 +46,24 @@ public class AppointmentController {
     @GetMapping("/{id}")
     public Appointment getById(@PathVariable String id){
         return repository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
+    }
+
+    @PutMapping("/{id}")
+    public Appointment updateAppointment(@PathVariable String id,@RequestBody Appointment appointment){
+        Appointment existing = repository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
+
+        existing.setPatientName(appointment.getPatientName());
+        existing.setAppointmentDate(appointment.getAppointmentDate());
+        existing.setDoctorName(appointment.getDoctorName());
+        existing.setStatus(appointment.getStatus());
+
+        return repository.save(existing);
+    }
+
+    @DeleteMapping("/{id}")
+    public Map<String, String> deleteAppointment(@PathVariable String id){
+        Appointment existing =  repository.findById(id).orElseThrow(() -> new AppointmentNotFoundException(id));
+        repository.deleteById(id);
+        return Map.of("message", "Appointment deleted successfully");
     }
 }
